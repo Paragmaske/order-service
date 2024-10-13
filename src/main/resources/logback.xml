@@ -1,0 +1,66 @@
+<configuration>
+    <property name="LOG_DIR" value="C:\\Users\\maske\\Desktop\\logs"/>
+
+    <!-- Console Appender for general application logs -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender for Controller logs -->
+    <appender name="ORDERCONTROLLER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/ordercontroller.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/ordercontroller-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender for ServiceImpl logs -->
+    <appender name="ORDERSERVICEIMPL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/orderserviceImpl.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/orderserviceImpl-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender for Exception logs -->
+    <appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/exception.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/exception-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root Logger for console logs (boilerplate) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Specific Logger for Controller logs (API hits) -->
+    <logger name="com.ecommerce.order.controller" level="INFO" additivity="false">
+        <appender-ref ref="ORDERCONTROLLER_FILE"/>
+    </logger>
+
+    <!-- Specific Logger for ServiceImpl logs -->
+    <logger name="com.ecommerce.order.serviceImpl" level="INFO" additivity="false">
+        <appender-ref ref="ORDERSERVICEIMPL_FILE"/>
+    </logger>
+
+    <!-- Logger for Exception logs -->
+    <logger name="com.ecommerce.order.ControllerAdvice" level="ERROR" additivity="false">
+        <appender-ref ref="EXCEPTION_FILE"/>
+    </logger>
+</configuration>
