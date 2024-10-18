@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_DIR" value="C:\\Users\\maske\\Desktop\\logs"/>
+    <property name="LOG_DIR" value="/app/logs"/> <!-- Adjusted to match the mounted path -->
 
     <!-- Console Appender for general application logs -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -8,11 +8,11 @@
         </encoder>
     </appender>
 
-    <!-- File Appender for Controller logs -->
-    <appender name="ORDERCONTROLLER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/ordercontroller.log</file>
+    <!-- File Appender for Aspect logs -->
+    <appender name="ORDERASPECT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/orderaspect.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/ordercontroller-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/orderaspect-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -20,7 +20,7 @@
         </encoder>
     </appender>
 
-    <!-- File Appender for ServiceImpl logs -->
+    <!-- File Appender for OrderServiceImpl logs -->
     <appender name="ORDERSERVICEIMPL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/orderserviceImpl.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -44,14 +44,14 @@
         </encoder>
     </appender>
 
-    <!-- Root Logger for console logs (boilerplate) -->
+    <!-- Root Logger for all logs at INFO level -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <!-- Specific Logger for Controller logs (API hits) -->
-    <logger name="com.ecommerce.order.controller" level="INFO" additivity="false">
-        <appender-ref ref="ORDERCONTROLLER_FILE"/>
+    <!-- Specific Logger for Aspect logs -->
+    <logger name="com.ecommerce.order.aspect" level="INFO" additivity="false">
+        <appender-ref ref="ORDERASPECT_FILE"/>
     </logger>
 
     <!-- Specific Logger for ServiceImpl logs -->

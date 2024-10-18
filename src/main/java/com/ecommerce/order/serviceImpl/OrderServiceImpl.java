@@ -33,10 +33,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     public OrderServiceImpl(WebClient.Builder webClientBuilder, OrderRepository orderRepository) {
-        this.productWebclient = webClientBuilder.baseUrl("http://localhost:8080/product").build();
-        this.paymentWebClient = webClientBuilder.baseUrl("http://localhost:8082/payment").build();
+        this.productWebclient = webClientBuilder.baseUrl("http://product-app:8080/product").build();
+        this.paymentWebClient = webClientBuilder.baseUrl("http://payment-app:8082/payment").build();
         this.orderRepository = orderRepository;
     }
+
 
     @Override
     public ResponseModel placeOrder(OrderRequest orderRequest) {
@@ -51,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Attempt to reduce product quantity
         try {
-            ProductResponse productResponse = productWebclient.put()
+             productWebclient.put()
                     .uri(uriBuilder -> uriBuilder
                             .path("/reduceQuantity/{id}")
                             .queryParam("quantity", orderRequest.getQuantity())
@@ -65,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
                                                 errorResponse.getResponseMsg(), 400, orderRequest));
                                     })
                     )
-                    .bodyToMono(ProductResponse.class)
+                    .bodyToMono(ResponseModel.class)
                     .block();
 
             logger.info("Product quantity reduced successfully, saving order: {}", order);
@@ -91,8 +92,7 @@ public class OrderServiceImpl implements OrderService {
                         .block();
 
                 logger.info("Payment successful with paymentId: {}", paymentId);
-                savedOrder.setOrderStatus("SUCCESSFUL");
-                orderRepository.save(savedOrder);
+                markOrderAsFailed(savedOrder, "SUCCESSFUL");
 
                 return ResponseModel.builder()
                         .statusModel(StatusModel.builder().statusCode(200).statusMsg("SUCCESS").build())
@@ -101,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
                         .build();
 
             } catch (WebClientRequestException e) {
+                markOrderAsFailed(order, "FAILED");
                 logger.error("Payment service down. Rolling back product quantity reduction.");
 
                 // Call the revert API to roll back the quantity in case of payment failure
@@ -123,12 +124,19 @@ public class OrderServiceImpl implements OrderService {
             }
 
         } catch (ProductServiceCustomException e) {
+            markOrderAsFailed(order, "FAILED");
             logger.error("Product service custom exception: {}", e.getMessage());
             throw e;
         } catch (WebClientRequestException e) {
+            markOrderAsFailed(order, "FAILED");
             logger.error("Product service down exception: {}", e.getMessage());
             throw new ServiceDownException("Product service is down", 500, orderRequest);
         }
+    }
+
+    private void markOrderAsFailed(Order order, String FAILED) {
+        order.setOrderStatus(FAILED);
+        orderRepository.save(order);
     }
 
     @Override

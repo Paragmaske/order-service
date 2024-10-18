@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  my-private-network:
+    external: true
+
+services:
+  order-db:
+    image: mysql:8.0.33
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: orderdb
+    ports:
+      - "3309:3306"
+    volumes:
+      - order_db_data:/var/lib/mysql
+    networks:
+      - my-private-network
+
+  order-app:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://order-db:3306/orderdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8081:8081"
+    depends_on:
+      - order-db
+    networks:
+      - my-private-network
+    volumes:
+      - C:/Users/Perennial/Desktop/logs/order:/app/logs  # Mounting the logs directory
+
+volumes:
+  order_db_data:
